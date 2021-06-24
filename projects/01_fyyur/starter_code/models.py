@@ -9,7 +9,7 @@ artist_genres = db.Table('artist_genres',
 
 
 venue_genres = db.Table('venue_genres',
-  db.Column('Venue', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
+  db.Column('Venue', db.Integer, db.ForeignKey('Venue.id'), primary_key=True),
   db.Column('genre', db.Integer, db.ForeignKey('genre.id'), primary_key=True),
 )
 
