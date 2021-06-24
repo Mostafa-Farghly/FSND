@@ -14,6 +14,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate, migrate
+import sys
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -194,19 +195,46 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  form = VenueForm(request.form)
+  form = VenueForm()
   if form.validate():
+    error = False
+    # insert form data as a new Venue record in the db, instead
+    try:
+      # genre table is already populated with genres data
+      genresList = Genre.query.filter(Genre.name.in_(form.genres.data)).all()
+      venue = Venue(
+        name=form.name.data,
+        city=form.city.data,
+        state=form.state.data,
+        address=form.address.data,
+        phone=form.phone.data,
+        image_link=form.image_link.data,
+        facebook_link=form.facebook_link.data,
+        website_link=form.website_link.data,
+        looking_for_talents=form.seeking_talent.data,
+        seeking_description=form.seeking_description.data
+      )
+      venue.genres = genresList
+      db.session.add(venue)
+      db.session.commit()
 
-    # TODO: insert form data as a new Venue record in the db, instead
-    # TODO: modify data to be the data object returned from db insertion
+    except:
+      error = True
+      db.session.rollback()
+      print(sys.exc_info())
+    finally:
+        db.session.close()
 
-    # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    if not error:
+      # on successful db insert, flash success
+      flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    else:
+      # on unsuccessful db insert, flash an error instead.
+      flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+      
     return render_template('pages/home.html')
   
+  # flash form validation error messages if form is not valid
   for _, error in form.errors.items():
     flash(error[0], category='error')
 
