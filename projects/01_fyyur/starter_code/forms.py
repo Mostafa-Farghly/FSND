@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_wtf import Form
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
-from wtforms.validators import DataRequired, AnyOf, URL, Regexp, Optional
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp, Optional, Length
 from enum import Enum
 
 
@@ -112,7 +112,7 @@ class VenueForm(Form):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone', validators=[DataRequired(), Regexp(r'^[0-9]{3}-{1}[0-9]{3}-{1}[0-9]{3}$', message='phone format is xxx-xxx-xxx')]
+        'phone', validators=[DataRequired(), Regexp(r'^[0-9]{3}-{1}[0-9]{3}-{1}[0-9]+$', message='phone format is xxx-xxx-xxx'), Length(min=11, max=12, message='Phone number has to be 9 or 10 digits')]
     )
     image_link = StringField(
         'image_link', validators=[URL(message='Image Link must be a valid URL'), Optional()]
@@ -150,7 +150,7 @@ class ArtistForm(Form):
         choices=[(member.value, member.value) for _, member in StatesEnum.__members__.items()]
     )
     phone = StringField(
-        'phone', validators=[DataRequired(), Regexp(r'^[0-9]{3}-{1}[0-9]{3}-{1}[0-9]{3}$', message='phone format is xxx-xxx-xxx')]
+        'phone', validators=[DataRequired(), Regexp(r'^[0-9]{3}-{1}[0-9]{3}-{1}[0-9]+$', message='phone format is xxx-xxx-xxx'), Length(min=11, max=12, message='Phone number has to be 9 or 10 digits')]
     )
     image_link = StringField(
         'image_link', validators=[URL(message='Image Link must be a valid URL'), Optional()]
