@@ -424,14 +424,48 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  form = ArtistForm()
+  if form.validate():
+    error = False
+    # insert form data as a new Artist record in the db, instead
+    try:
+      # genre table is already populated with genres data
+      genresList = Genre.query.filter(Genre.name.in_(form.genres.data)).all()
+      artist = Artist(
+        name=form.name.data,
+        city=form.city.data,
+        state=form.state.data,
+        phone=form.phone.data,
+        image_link=form.image_link.data,
+        facebook_link=form.facebook_link.data,
+        website_link=form.website_link.data,
+        looking_for_venues=form.seeking_venue.data,
+        seeking_description=form.seeking_description.data
+      )
+      artist.genres = genresList
+      db.session.add(artist)
+      db.session.commit()
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+    except:
+      error = True
+      db.session.rollback()
+      print(sys.exc_info())
+    finally:
+        db.session.close()
+
+    if not error:
+      # on successful db insert, flash success
+      flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    else:
+      # on unsuccessful db insert, flash an error instead.
+      flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+      
+    return render_template('pages/home.html')
+  
+  # flash form validation error messages if form is not valid
+  for _, error in form.errors.items():
+    flash(error[0], category='error')
+  return render_template('forms/new_artist.html', form=form)
 
 
 #  Shows
