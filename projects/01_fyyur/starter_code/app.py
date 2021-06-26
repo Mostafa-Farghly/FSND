@@ -62,29 +62,26 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+  data = []
+
+  # find all groups of city, and state in the database
+  for group in db.session.query(Venue.city, Venue.state).group_by(Venue.city, Venue.state).all():
+    groupData = {
+      "city": group.city,
+      "state": group.state,
+      "venues": []
+    }
+    # get all venues of the group (same city and state)
+    for venue in Venue.query.filter(Venue.city==group.city and Venue.state==group.state).all():
+      venue_dict = {
+        "id": venue.id,
+        "name": venue.name,
+        "num_upcoming_shows": len(Show.query.filter(Show.venue_id==venue.id, Show.start_time > datetime.now()).all())
+      }
+      groupData["venues"].append(venue_dict)
+
+    data.append(groupData)
+
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
@@ -425,7 +422,7 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
-  # TODO: replace with real venues data.
+
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[]
   for show in Show.query.all():
