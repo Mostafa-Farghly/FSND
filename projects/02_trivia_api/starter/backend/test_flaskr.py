@@ -18,6 +18,13 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgresql://{}:{}@{}/{}".format('student', 'student', 'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
+        self.new_question = {
+            'question': 'What is the student\'s name?',
+            'answer': 'Mostafa',
+            'difficulty': 5,
+            'category': 5
+        }
+
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -92,6 +99,22 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
+
+    def test_create_new_question(self):
+        res = self.client().post('\questions', json=self.new_question)
+        data = json.loads(res.data)
+
+        #self.assertEqual(res.status_code, 200)
+        #self.assertEqual(data['success'], True)
+        pass
+
+    def test_400_add_bad_format_question(self):
+        res = self.client().post('/questions', json={})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
 
 
 # Make the tests conveniently executable
