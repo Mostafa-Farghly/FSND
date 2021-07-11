@@ -34,6 +34,49 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
 
+    def test_get_paginated_questions_defaut_page(self):
+        """
+        GET request for '/questions' endpoint should return a list of
+        questions (default page), number of total questions, current category, categories.  
+        """
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['current_category'])
+        self.assertTrue(len(data['categories']))
+        self.assertTrue(len(data['questions']))
+
+    def test_get_paginated_questions_page_2(self):
+        """
+        GET request for '/questions?page=2' endpoint should return a list of
+        questions (page 2), number of total questions, current category,
+        categories.  
+        """
+        res = self.client().get('/questions?page=2')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['current_category'])
+        self.assertTrue(len(data['categories']))
+        self.assertTrue(len(data['questions']))
+
+    def test_404_requesting_paginated_questions_beyond_valid_page(self):
+        """
+        GET request for '/questions?page=1000' endpoint should result in
+        a 404 error, as it is requesting beyond the valid pages.
+        """
+        res = self.client().get('/questions?page=1000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
