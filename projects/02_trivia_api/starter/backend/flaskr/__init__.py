@@ -1,4 +1,5 @@
 import os
+from re import search
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -122,28 +123,46 @@ def create_app(test_config=None):
   of the questions list in the "List" tab.  
   '''
   @app.route('/questions', methods=['POST'])
-  def create_new_question():
+  def create_and_search_question():
     body = request.get_json()
 
-    question = body.get('question', None)
-    answer = body.get('answer', None)
-    difficulty = body.get('difficulty', None)
-    category = body.get('category', None)
+    search_term = body.get('searchTerm', None)
+    # perform search for questions if searchTerm is in request body
+    if search_term:
+      selection = Question.query.filter(
+        Question.question.ilike('%{}%'.format(search_term))
+        ).all()
 
-    if (question is None or answer is None or
-          difficulty is None or category is None):
-      abort(400)
-
-    try:
-      new_question = Question(question, answer, category, difficulty)
-      new_question.insert()
+      current_questions = paginate_questions(request, selection)
 
       return jsonify({
-        'success': True
+        'success': True,
+        'questions': current_questions,
+        'total_questions': len(selection),
+        'current_category': 'All'
       })
 
-    except:
-      abort(422)
+    # create new question if searchTerm is not in request body
+    else:
+      question = body.get('question', None)
+      answer = body.get('answer', None)
+      difficulty = body.get('difficulty', None)
+      category = body.get('category', None)
+
+      if (question is None or answer is None or
+            difficulty is None or category is None):
+        abort(400)
+
+      try:
+        new_question = Question(question, answer, category, difficulty)
+        new_question.insert()
+
+        return jsonify({
+          'success': True
+        })
+
+      except:
+        abort(422)
 
   '''
   @TODO: 
