@@ -49,8 +49,7 @@ def create_app(test_config=None):
     return response
 
   '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
+  Endpoint to handle GET requests 
   for all available categories.
   '''
   @app.route('/categories')
@@ -64,8 +63,7 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
+  Endpoint to handle GET requests for questions, 
   including pagination (every 10 questions). 
   This endpoint should return a list of questions, 
   number of total questions, current category, categories. 
@@ -96,8 +94,7 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
+  Endpoint to DELETE question using a question ID. 
 
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
@@ -121,14 +118,22 @@ def create_app(test_config=None):
       abort(422)
 
   '''
-  @TODO: 
-  Create an endpoint to POST a new question, 
+  Endpoint to POST a new question, 
   which will require the question and answer text, 
   category, and difficulty score.
 
   TEST: When you submit a question on the "Add" tab, 
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
+  '''
+  '''
+  POST endpoint to get questions based on a search term. 
+  It should return any questions for whom the search term 
+  is a substring of the question. 
+
+  TEST: Search by any phrase. The questions list will update to include 
+  only question that include that string within their question. 
+  Try using the word "title" to start. 
   '''
   @app.route('/questions', methods=['POST'])
   def create_and_search_question():
@@ -173,19 +178,7 @@ def create_app(test_config=None):
         abort(422)
 
   '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
-
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
-
-  '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
+  GET endpoint to get questions based on category. 
 
   TEST: In the "List" tab / main screen, clicking on one of the 
   categories in the left column will cause only questions of that 
@@ -213,8 +206,7 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
+  POST endpoint to get questions to play the quiz. 
   This endpoint should take category and previous question parameters 
   and return a random questions within the given category, 
   if provided, and that is not one of the previous questions. 
@@ -243,7 +235,7 @@ def create_app(test_config=None):
 
       if category_check is None:
         abort(404)
-        
+
       question = Question.query.filter(
         Question.id.not_in(previous_questions),
         Question.category == quiz_category['id']
@@ -258,9 +250,7 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
+  Error handlers for all expected errors. 
   '''
   @app.errorhandler(404)
   def not_found(error):
