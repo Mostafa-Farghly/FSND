@@ -1,6 +1,7 @@
 import os
 import unittest
 import json
+from flask.json import jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
@@ -160,6 +161,63 @@ class TriviaTestCase(unittest.TestCase):
         a non-existent category.
         """
         res = self.client().get('/categories/1000/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+    def test_get_quiz_next_question(self):
+        res = self.client().post('/quizzes', json={
+            "previous_questions": [20, 21],
+            "quiz_category": {
+                "type": 'Science',
+                "id": 1
+            }
+        })
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['question']['category'], 1)
+        self.assertNotIn(data['question']['id'], [20, 21])
+
+    def test_get_quiz_next_question_after_questions_ended(self):
+        res = self.client().post('/quizzes', json={
+            "previous_questions": [20, 21, 22],
+            "quiz_category": {
+                "type": 'Science',
+                "id": 1
+            }
+        })
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertFalse(data['question'])
+
+    def test_get_quiz_next_question_all_categories(self):
+        res = self.client().post('/quizzes', json={
+            "previous_questions": [20, 21],
+            "quiz_category": {
+                "type": 'all',
+                "id": 0
+            }
+        })
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertNotIn(data['question']['id'], [20, 21])
+
+    def test_404_get_quiz_next_question_unvalid_category(self):
+        res = self.client().post('/quizzes', json={
+            "previous_questions": [],
+            "quiz_category": {
+                "type": 'Biology',
+                "id": 1000
+            }
+        })
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
