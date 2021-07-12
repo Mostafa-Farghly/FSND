@@ -144,6 +144,28 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(len(data['categories']), 6)
 
+    def test_get_category_questions(self):
+        res = self.client().get('/categories/1/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['questions']), 3)
+        self.assertEqual(data['total_questions'], 3)
+        self.assertEqual(data['current_category'], 'Science')
+
+    def test_404_get_non_existent_category_questions(self):
+        """
+        Excepect a 404 response when trying to get questions from
+        a non-existent category.
+        """
+        res = self.client().get('/categories/1000/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
