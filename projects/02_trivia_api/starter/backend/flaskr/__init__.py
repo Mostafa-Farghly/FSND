@@ -139,6 +139,9 @@ def create_app(test_config=None):
   def create_and_search_question():
     body = request.get_json()
 
+    if body is None:
+      abort(400)
+
     search_term = body.get('searchTerm', None)
     # perform search for questions if searchTerm is in request body
     if search_term:
@@ -218,6 +221,9 @@ def create_app(test_config=None):
   @app.route('/quizzes', methods=['POST'])
   def get_quiz_next_question():
     body = request.get_json()
+
+    if body is None:
+      abort(400)
     
     previous_questions = body.get('previous_questions', [])
     quiz_category = body.get('quiz_category', {'id': 0})
