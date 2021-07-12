@@ -32,7 +32,7 @@ The [./frontend](https://github.com/Mostafa-Farghly/FSND/blob/master/projects/02
 ## Deployment N/A
 
 ## Authors
-Udacity FSND Team
+Udacity FSND Team<br>
 Mostafa Alaa 
 
 ## Acknowledgements 
