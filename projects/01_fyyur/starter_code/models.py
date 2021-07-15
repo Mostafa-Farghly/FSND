@@ -3,19 +3,19 @@ from app import db
 
 
 artist_genres = db.Table('artist_genres',
-  db.Column('Artist', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
-  db.Column('genre', db.Integer, db.ForeignKey('genre.id'), primary_key=True),
+  db.Column('artists', db.Integer, db.ForeignKey('artists.id'), primary_key=True),
+  db.Column('genres', db.Integer, db.ForeignKey('genres.id'), primary_key=True),
 )
 
 
 venue_genres = db.Table('venue_genres',
-  db.Column('Venue', db.Integer, db.ForeignKey('Venue.id'), primary_key=True),
-  db.Column('genre', db.Integer, db.ForeignKey('genre.id'), primary_key=True),
+  db.Column('venues', db.Integer, db.ForeignKey('venues.id'), primary_key=True),
+  db.Column('genres', db.Integer, db.ForeignKey('genres.id'), primary_key=True),
 )
 
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+    __tablename__ = 'venues'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
@@ -29,14 +29,14 @@ class Venue(db.Model):
     website_link = db.Column(db.String())
     looking_for_talents = db.Column(db.Boolean, nullable=False)
     seeking_description = db.Column(db.String())
-    shows = db.relationship('Show', backref='venue', cascade="all, delete-orphan", lazy=True)
+    shows = db.relationship('Shows', backref='venue', cascade="all, delete-orphan", lazy=True)
 
     def __repr__(self):
       return f'<Venue {self.id} {self.name} {self.city} {self.state} {self.phone} {self.genres} {self.looking_for_talents} {self.shows}>.'
 
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'artists'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
@@ -49,18 +49,18 @@ class Artist(db.Model):
     website_link = db.Column(db.String())
     looking_for_venues = db.Column(db.Boolean, nullable=False)
     seeking_description = db.Column(db.String())
-    shows = db.relationship('Show', backref='artist', cascade="all, delete-orphan", lazy=True)
+    shows = db.relationship('Shows', backref='artist', cascade="all, delete-orphan", lazy=True)
 
     def __repr__(self):
       return f'<Artist {self.id} {self.name} {self.city} {self.state} {self.phone} {self.genres} {self.looking_for_venues} {self.shows}>.'
 
 
 class Show(db.Model):
-    _tablename__ = 'show'
+    _tablename__ = 'shows'
 
     id = db.Column(db.Integer, primary_key=True)
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
@@ -68,7 +68,7 @@ class Show(db.Model):
 
 
 class Genre(db.Model):
-  __tablename__ = 'genre'
+  __tablename__ = 'genres'
 
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(), unique=True, nullable=False)
