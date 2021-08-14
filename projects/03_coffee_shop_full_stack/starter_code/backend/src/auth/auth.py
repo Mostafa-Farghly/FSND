@@ -89,7 +89,7 @@ def check_permissions(permission, payload):
     return True
 
 '''
-@TODO implement verify_decode_jwt(token) method
+    implement verify_decode_jwt(token) method
     @INPUTS
         token: a json web token (string)
 
@@ -149,14 +149,14 @@ def verify_decode_jwt(token):
                 'code': 'invalid_header',
                 'description': 'Unable to parse authentication token.'
             }, 400)
-            
+
     raise AuthError({
                 'code': 'invalid_header',
                 'description': 'Unable to find the appropriate key.'
             }, 400)
 
 '''
-@TODO implement @requires_auth(permission) decorator method
+    implement @requires_auth(permission) decorator method
     @INPUTS
         permission: string permission (i.e. 'post:drink')
 
