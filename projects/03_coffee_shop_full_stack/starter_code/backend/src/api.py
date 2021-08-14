@@ -79,7 +79,7 @@ def post_drinks(payload):
     if title is None or recipe is None:
         abort(400)
 
-    recipe = json.dumps(recipe)
+    recipe = json.dumps([recipe])
     drink = Drink(title=title, recipe=recipe)
     try:
         drink.insert()
